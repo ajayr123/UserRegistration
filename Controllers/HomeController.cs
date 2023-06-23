@@ -9,6 +9,7 @@ using UserRegistration.Models;
 
 namespace UserRegistration.Controllers
 {
+    //Home
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
