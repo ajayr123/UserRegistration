@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>User List</h1>
+
+<p>
+    <a id="btnAddUser" onclick="showModel(0)" class="btn btn-primary text-white">Add</a>
+</p>
+<table class="table" id="tblUserList">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Phone
+            </th>
+            <th>
+                City
+            </th>
+            <th>
+                State
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div class="modal fade bd-example-modal-lg" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="divUserModal">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+            $("#divUserModal").on('click', '#btnSubmitUser', function () {
+                if (!$("#frmUser").valid()) {
+                    return false;
+                }
+                debugger;
+                $.ajax({
+                    url: "/User/Save",
+                    type: "POST",
+                    dataType: "json",
+                    data: $("#frmUser").serialize(),
+                    success: function (res) {
+                        if (res.status) {
+                            oTable.ajax.reload();
+                        }
+                        $("#userModal").modal('hide');
+                        alert(res.message)
+                    },
+                    error: function (res) {
+                        alert("Internal server error")
+                    }
+                });
+
+            });
+
+            $("#divUserModal").on('change', '#StateId', function () {
+                $.ajax({
+                    url: "/User/GetCityList",
+                    type: "GET",
+                    data: { id: $("#StateId").val() },
+                    success: function (res) {
+                        $("#CityId").empty();
+                        $("#CityId").append(new Option("--Select--", ""));
+
+                        $.each(res, function (_, value) {
+                            if ($("#tempCity").val() == value.value) {
+                                $("#CityId").append(new Option(value.text, value.value, true, true));
+                            } else {
+                                $("#CityId").append(new Option(value.text, value.value));
+                            }
+                        });
+                    },
+                    error: function (res) {
+                        alert("Internal server error")
+                    }
+                });
+            });
+
+            $("#divUserModal").on('change', '#IsAgree', function () {
+                if (this.checked) {
+                    $("#btnSubmitUser").prop("disabled", false);
+                } else {
+                    $("#btnSubmitUser").prop("disabled", true);
+                }
+            });
+        });
+
+        var oTable = $("#tblUserList").DataTable({
+            ajax: '/User/GetAllUser',
+            columns: [
+                { data: 'name' },
+                { data: 'email' },
+                { data: 'phone' },
+                { data: 'cityName' },
+                { data: 'stateName' },
+                {
+                    data: 'id',
+                    render: function (userId, _, _) {
+                        return '<a class="btn btn-primary text-white" href="#" onclick="showModel(' + userId + ')">Edit</a>';
+                    }
+                },
+                {
+                    data: 'id',
+                    render: function (userId, _, _) {
+                        return '<a class="btn btn-danger text-white" onclick="deleteuser(' + userId + ')">Delete</i></a>';
+                    }
+                },
+            ],
+            columnDefs: [{
+                targets: 5,
+                orderable: false
+            }, {
+                targets: 6,
+                orderable: false
+            }
+            ]
+        });
+
+        function showModel(id) {
+            var $modelUserAddEditBody = $("#userModal .modal-body");
+            $modelUserAddEditBody.html("");
+            $("#userModal").modal('show');
+            $modelUserAddEditBody.load('/User/AddEditModel?id=' + id, function () {
+                $.validator.unobtrusive.parse($("#frmUser"));
+                $('#StateId').trigger('change');
+            });
+        }
+
+        function deleteuser(id) {
+            if (confirm("Are you sure, you want to delete ?")) {
+                $.ajax({
+                    url: "/User/DeleteUser",
+                    type: "POST",
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.status) {
+                            oTable.ajax.reload();
+                        }
+                        alert(res.message)
+                    },
+                    error: function (res) {
+                        alert("Internal server error")
+                    }
+                });
+            }
+        }
+    </script>
+}

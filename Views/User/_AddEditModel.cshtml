@@ -1,0 +1,53 @@
+﻿@model UserRegistration.Models.UserAddModel
+
+@{
+    Layout = null;
+}
+
+
+<form id="frmUser" class="container">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <input type="hidden" asp-for="Id" class="form-control" />
+        <input type="hidden" id="tempCity" value="@Model.CityId" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone" class="control-label"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address" class="control-label"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="StateId">State</label>
+        <select asp-for="StateId" asp-items="@ViewBag.StateList" class="form-control">
+            <option value="">--Select--</option>
+        </select>
+        <span asp-validation-for="StateId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CityId">City</label>
+        <select asp-for="CityId" class="form-control"></select>
+        <span asp-validation-for="CityId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="checkbox" id="IsAgree" />
+        <label for="IsAgree"> Agree?</label>
+    </div>
+    <div class="form-group">
+        <input type="button" disabled id="btnSubmitUser" value="Save" class="btn btn-primary" />
+    </div>
+</form>
